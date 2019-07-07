@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script   src="https://code.jquery.com/jquery-3.4.1.min.js"   integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="   crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        h2{
+            border-bottom-style: ridge;
+            border-bottom-color: black;
+            border-bottom-width: 7px;
+            padding: 10px;
+        }
+        #allUsersButton{
+            margin-left: 100px;
+        }
+        #placeholder{
+            width: 250px;
+            height: 50px;
+        }
+    </style>
+    <title>Index</title>
+</head>
+<body>
+    <h2>Welcome to Message Board </h2> 
+    <div id='placeholder'>Placeholder</div>
+    <form action='/postMessage' method='post' class='postForm'>
+        <h4>Name:</h4>
+        <input type='text' name='name'>
+        <h4>Message:</h4>
+        <input type='text' style="width: 600px; height: 100px;" name='message'><br>
+        <button id='submitMessage' style='margin-left: 520px; background-color: darkorange;' type='submit'>Post Message</button>
+    </form>
+    <script>
+        $('.postForm').submit(function(e){
+            e.preventDefault()
+            $.ajax({
+                url: '/postMessage',
+                method: 'POST',
+                data: $(this).parent().serialize(),
+                success: function(serverResponse){
+                    console.log('ajax is working')
+                    $('#placeholder').html(serverResponse) 
+                }
+            })
+        })
+    </script> 
+
+    <div id='allComments'>
+        <% for (m in messages) { %>
+            <h3 style='color: orangered;'>Name: <%= messages[m].name %></h3>
+            <h3 style='color: orangered;'>Message: <%= messages[m].message %></h3>
+            <div id='comments' style='margin-left: 50px; margin-top: 20px;'>
+                <% for( c in messages[m].comments) {%>
+                    <% if(messages[m].comments[c].commenter != null) {%>
+                        <p>Name: <%= messages[m].comments[c].commenter %></p><br>
+                        <p>Comment: <%= messages[m].comments[c].comment %></p><br>
+                    <% } %>
+                <% } %>
+            </div>
+            <div id='formComment'>
+                <form action='/newComment/<%= messages[m].id %>' method='post' style='margin-left: 150px;' >
+                    <h4>Name:</h4>
+                    <input type='text' name='commenter'>
+                    <h4>Comment:</h4>
+                    <input type='text' style="width: 600px; height: 100px;" name='comment'><br>
+                    <button style='margin-left: 520px; background-color: plum' type='submit'>Make Comment</button>
+                </form>
+            </div>
+        <% } %>
+    </div>
+</body>
+</html>
